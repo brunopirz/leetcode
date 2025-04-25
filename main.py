@@ -5,6 +5,9 @@ Aplicativo desktop para auxiliar na resolução de questões do LeetCode com cap
 from ui_manager import UIManager
 
 def main():
+    """
+    Função principal que inicializa e executa a interface do usuário.
+    """
     app = UIManager()
     app.run()
 

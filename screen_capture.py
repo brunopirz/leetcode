@@ -8,7 +8,23 @@ from PIL import Image, ImageTk
 import io
 
 class ScreenCapture:
+    """
+    Módulo para captura de tela seletiva usando mss e Tkinter para seleção dinâmica.
+
+    Atributos:
+        ui_manager: Referência ao gerenciador de interface do usuário.
+        capture_window: Janela de captura de tela.
+        start_x, start_y, end_x, end_y: Coordenadas para seleção de área.
+        rect: Retângulo de seleção.
+        preview_img: Imagem de pré-visualização.
+    """
     def __init__(self, ui_manager):
+        """
+        Inicializa o módulo de captura de tela com o gerenciador de interface do usuário.
+
+        Parâmetros:
+            ui_manager: O gerenciador de interface do usuário associado.
+        """
         self.ui_manager = ui_manager
         self.capture_window = None
         self.start_x = self.start_y = self.end_x = self.end_y = 0
@@ -16,6 +32,9 @@ class ScreenCapture:
         self.preview_img = None
 
     def start_capture(self):
+        """
+        Inicia o processo de captura de tela, criando uma janela de seleção.
+        """
         self.capture_window = tk.Toplevel(self.ui_manager.root)
         self.capture_window.attributes('-fullscreen', True)
         self.capture_window.attributes('-alpha', 0.3)
@@ -26,6 +45,12 @@ class ScreenCapture:
         self.capture_window.focus_set()
 
     def on_mouse_down(self, event):
+        """
+        Registra a posição inicial do clique do mouse para a seleção.
+
+        Parâmetros:
+            event: Evento de clique do mouse.
+        """
         self.start_x = self.capture_window.winfo_pointerx()
         self.start_y = self.capture_window.winfo_pointery()
         if self.rect:
@@ -33,6 +58,12 @@ class ScreenCapture:
         self.rect = None
 
     def on_mouse_drag(self, event):
+        """
+        Atualiza o retângulo de seleção conforme o mouse é arrastado.
+
+        Parâmetros:
+            event: Evento de arrasto do mouse.
+        """
         x, y = self.capture_window.winfo_pointerx(), self.capture_window.winfo_pointery()
         if self.rect:
             self.capture_window.delete(self.rect)
@@ -40,6 +71,12 @@ class ScreenCapture:
         self.rect = canvas.create_rectangle(self.start_x, self.start_y, x, y, outline='red', width=2)
 
     def on_mouse_up(self, event):
+        """
+        Finaliza a seleção e captura a área selecionada.
+
+        Parâmetros:
+            event: Evento de liberação do mouse.
+        """
         self.end_x = self.capture_window.winfo_pointerx()
         self.end_y = self.capture_window.winfo_pointery()
         self.capture_window.destroy()
@@ -47,6 +84,9 @@ class ScreenCapture:
         self._capture_area()
 
     def _capture_area(self):
+        """
+        Captura a área selecionada da tela e exibe a pré-visualização.
+        """
         x1, y1 = min(self.start_x, self.end_x), min(self.start_y, self.end_y)
         x2, y2 = max(self.start_x, self.end_x), max(self.start_y, self.end_y)
         with mss.mss() as sct:
@@ -57,6 +97,12 @@ class ScreenCapture:
             self.show_preview(img_pil)
 
     def show_preview(self, img_pil):
+        """
+        Exibe a pré-visualização da captura de tela em uma nova janela.
+
+        Parâmetros:
+            img_pil: Imagem capturada a ser exibida.
+        """
         if self.ui_manager.preview_window:
             self.ui_manager.preview_window.destroy()
         preview = Toplevel(self.ui_manager.root)
@@ -74,7 +120,12 @@ class ScreenCapture:
             self.ui_manager.preview_window.withdraw()
 
     def get_canvas(self):
-        # Cria um canvas transparente sobre a janela de captura
+        """
+        Cria um canvas transparente sobre a janela de captura.
+
+        Retorna:
+            Canvas: O canvas criado para desenhar a seleção.
+        """
         if not hasattr(self, '_canvas'):
             self._canvas = tk.Canvas(self.capture_window, bg='', highlightthickness=0)
             self._canvas.pack(fill=tk.BOTH, expand=True)

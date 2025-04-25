@@ -7,6 +7,12 @@ from dotenv import load_dotenv
 
 class APIManager:
     def __init__(self):
+        """
+        Inicializa o gerenciador de API carregando a chave da API e configurando a URL e o modelo.
+
+        Levanta:
+            ValueError: Se a chave da API não for encontrada no arquivo .env.
+        """
         load_dotenv()
         self.api_key = os.getenv("OPENAI_API_KEY")
         if not self.api_key:
@@ -15,6 +21,18 @@ class APIManager:
         self.model = os.getenv("OPENAI_MODEL", "gpt-4-1106-preview")
 
     def send_question(self, texto):
+        """
+        Envia uma pergunta para a API do ChatGPT e retorna a resposta.
+
+        Parâmetros:
+            texto (str): A pergunta a ser enviada para a API.
+
+        Retorna:
+            str: A resposta da API.
+
+        Levanta:
+            Exception: Se ocorrer um erro ao conectar à API ou se a chave de API for inválida.
+        """
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
